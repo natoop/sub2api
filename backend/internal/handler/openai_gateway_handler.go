@@ -33,6 +33,7 @@ type OpenAIGatewayHandler struct {
 	usageRecordWorkerPool    *service.UsageRecordWorkerPool
 	errorPassthroughService  *service.ErrorPassthroughService
 	contentModerationService *service.ContentModerationService
+	contextCompressionSvc    *service.ContextCompressionService
 	concurrencyHelper        *ConcurrencyHelper
 	imageLimiter             *imageConcurrencyLimiter
 	maxAccountSwitches       int
@@ -55,6 +56,7 @@ func NewOpenAIGatewayHandler(
 	usageRecordWorkerPool *service.UsageRecordWorkerPool,
 	errorPassthroughService *service.ErrorPassthroughService,
 	contentModerationService *service.ContentModerationService,
+	contextCompressionSvc *service.ContextCompressionService,
 	cfg *config.Config,
 ) *OpenAIGatewayHandler {
 	pingInterval := time.Duration(0)
@@ -72,6 +74,7 @@ func NewOpenAIGatewayHandler(
 		usageRecordWorkerPool:    usageRecordWorkerPool,
 		errorPassthroughService:  errorPassthroughService,
 		contentModerationService: contentModerationService,
+		contextCompressionSvc:    contextCompressionSvc,
 		concurrencyHelper:        NewConcurrencyHelper(concurrencyService, SSEPingFormatComment, pingInterval),
 		imageLimiter:             &imageConcurrencyLimiter{},
 		maxAccountSwitches:       maxAccountSwitches,
@@ -195,6 +198,15 @@ func (h *OpenAIGatewayHandler) Responses(c *gin.Context) {
 	if decision := h.checkContentModeration(c, reqLog, apiKey, subject, service.ContentModerationProtocolOpenAIResponses, reqModel, body); decision != nil && decision.Blocked {
 		h.errorResponse(c, contentModerationStatus(decision), contentModerationErrorCode(decision), decision.Message)
 		return
+	}
+
+	// 上下文压缩：对 Responses API 的 input 数组进行截断
+	if h.contextCompressionSvc != nil {
+		if compressedBody, compressed := h.contextCompressionSvc.CompressResponsesBody(body, reqModel, service.PlatformOpenAI); compressed {
+			body = compressedBody
+			sessionHashBody = compressedBody
+			reqLog.Info("context_compression.responses_applied")
+		}
 	}
 
 	imageIntent := service.IsImageGenerationIntent("/v1/responses", reqModel, body)

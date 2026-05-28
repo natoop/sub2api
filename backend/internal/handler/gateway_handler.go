@@ -48,6 +48,7 @@ type GatewayHandler struct {
 	usageRecordWorkerPool     *service.UsageRecordWorkerPool
 	errorPassthroughService   *service.ErrorPassthroughService
 	contentModerationService  *service.ContentModerationService
+	contextCompressionSvc     *service.ContextCompressionService
 	concurrencyHelper         *ConcurrencyHelper
 	userMsgQueueHelper        *UserMsgQueueHelper
 	maxAccountSwitches        int
@@ -70,6 +71,7 @@ func NewGatewayHandler(
 	errorPassthroughService *service.ErrorPassthroughService,
 	contentModerationService *service.ContentModerationService,
 	userMsgQueueService *service.UserMessageQueueService,
+	contextCompressionSvc *service.ContextCompressionService,
 	cfg *config.Config,
 	settingService *service.SettingService,
 ) *GatewayHandler {
@@ -103,6 +105,7 @@ func NewGatewayHandler(
 		usageRecordWorkerPool:     usageRecordWorkerPool,
 		errorPassthroughService:   errorPassthroughService,
 		contentModerationService:  contentModerationService,
+		contextCompressionSvc:     contextCompressionSvc,
 		concurrencyHelper:         NewConcurrencyHelper(concurrencyService, SSEPingFormatClaude, pingInterval),
 		userMsgQueueHelper:        umqHelper,
 		maxAccountSwitches:        maxAccountSwitches,
@@ -162,6 +165,15 @@ func (h *GatewayHandler) Messages(c *gin.Context) {
 	reqModel := parsedReq.Model
 	reqStream := parsedReq.Stream
 	reqLog = reqLog.With(zap.String("model", reqModel), zap.Bool("stream", reqStream))
+
+	// 上下文压缩：在请求转发前对消息列表进行截断，减少上游 token 消耗
+	if h.contextCompressionSvc != nil {
+		if compressed := h.contextCompressionSvc.CompressAnthropicParsedRequest(parsedReq); compressed {
+			reqLog.Info("context_compression.applied",
+				zap.Int("compressed_message_count", len(parsedReq.Messages)),
+			)
+		}
+	}
 
 	// 解析渠道级模型映射
 	channelMapping, _ := h.gatewayService.ResolveChannelMappingAndRestrict(c.Request.Context(), apiKey.GroupID, reqModel)

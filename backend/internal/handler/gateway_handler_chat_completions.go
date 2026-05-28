@@ -81,6 +81,15 @@ func (h *GatewayHandler) ChatCompletions(c *gin.Context) {
 	setOpsRequestContext(c, reqModel, reqStream)
 	setOpsEndpointContext(c, "", int16(service.RequestTypeFromLegacy(reqStream, false)))
 
+	// 上下文压缩：对 Chat Completions 消息列表进行截断
+	if h.contextCompressionSvc != nil && apiKey.Group != nil {
+		platform := apiKey.Group.Platform
+		if compressedBody, compressed := h.contextCompressionSvc.CompressChatCompletionsBody(body, reqModel, platform); compressed {
+			body = compressedBody
+			reqLog.Info("context_compression.chat_completions_applied")
+		}
+	}
+
 	// 解析渠道级模型映射
 	channelMapping, _ := h.gatewayService.ResolveChannelMappingAndRestrict(c.Request.Context(), apiKey.GroupID, reqModel)
 

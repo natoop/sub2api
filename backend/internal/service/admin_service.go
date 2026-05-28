@@ -219,6 +219,14 @@ type CreateGroupInput struct {
 	RPMLimit int
 	// ContextCompressionEnabled 是否启用上下文压缩
 	ContextCompressionEnabled bool
+	// ContextCompressionStrategy 上下文压缩策略，空表示继承全局配置
+	ContextCompressionStrategy string
+	// ContextCompressionTriggerTokens 触发压缩的 token 阈值，0 表示继承全局配置
+	ContextCompressionTriggerTokens int
+	// ContextCompressionKeepLastMessages 压缩后保留最近消息数，0 表示继承全局配置
+	ContextCompressionKeepLastMessages int
+	// ContextCompressionKeepLastTokens 压缩后保留最近 token 数，0 表示继承全局配置
+	ContextCompressionKeepLastTokens int
 	// 从指定分组复制账号（创建分组后在同一事务内绑定）
 	CopyAccountsFromGroupIDs []int64
 }
@@ -261,6 +269,14 @@ type UpdateGroupInput struct {
 	RPMLimit *int
 	// ContextCompressionEnabled 是否启用上下文压缩，nil 表示未提供不改动
 	ContextCompressionEnabled *bool
+	// ContextCompressionStrategy 上下文压缩策略，nil 表示未提供不改动；空字符串表示继承全局配置
+	ContextCompressionStrategy *string
+	// ContextCompressionTriggerTokens 触发压缩的 token 阈值，nil 表示未提供不改动，0 表示继承全局配置
+	ContextCompressionTriggerTokens *int
+	// ContextCompressionKeepLastMessages 压缩后保留最近消息数，nil 表示未提供不改动，0 表示继承全局配置
+	ContextCompressionKeepLastMessages *int
+	// ContextCompressionKeepLastTokens 压缩后保留最近 token 数，nil 表示未提供不改动，0 表示继承全局配置
+	ContextCompressionKeepLastTokens *int
 	// 从指定分组复制账号（同步操作：先清空当前分组的账号绑定，再绑定源分组的账号）
 	CopyAccountsFromGroupIDs []int64
 }
@@ -1635,6 +1651,20 @@ func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupIn
 		}
 	}
 
+	contextCompressionStrategy, err := normalizeContextCompressionStrategy(input.ContextCompressionStrategy)
+	if err != nil {
+		return nil, err
+	}
+	if err := validateContextCompressionInt("context_compression_trigger_tokens", input.ContextCompressionTriggerTokens); err != nil {
+		return nil, err
+	}
+	if err := validateContextCompressionInt("context_compression_keep_last_messages", input.ContextCompressionKeepLastMessages); err != nil {
+		return nil, err
+	}
+	if err := validateContextCompressionInt("context_compression_keep_last_tokens", input.ContextCompressionKeepLastTokens); err != nil {
+		return nil, err
+	}
+
 	// MCPXMLInject：默认为 true，仅当显式传入 false 时关闭
 	mcpXMLInject := true
 	if input.MCPXMLInject != nil {
@@ -1703,6 +1733,10 @@ func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupIn
 		MessagesDispatchModelConfig:     normalizeOpenAIMessagesDispatchModelConfig(input.MessagesDispatchModelConfig),
 		RPMLimit:                        input.RPMLimit,
 		ContextCompressionEnabled:       input.ContextCompressionEnabled,
+		ContextCompressionStrategy:      contextCompressionStrategy,
+		ContextCompressionTriggerTokens: input.ContextCompressionTriggerTokens,
+		ContextCompressionKeepLastMessages: input.ContextCompressionKeepLastMessages,
+		ContextCompressionKeepLastTokens:   input.ContextCompressionKeepLastTokens,
 	}
 	sanitizeGroupMessagesDispatchFields(group)
 	if err := s.groupRepo.Create(ctx, group); err != nil {
@@ -1755,6 +1789,23 @@ func normalizePrice(price *float64) *float64 {
 		return nil
 	}
 	return price
+}
+
+func normalizeContextCompressionStrategy(strategy string) (string, error) {
+	normalized := strings.ToLower(strings.TrimSpace(strategy))
+	switch normalized {
+	case "", "truncate", "summarize":
+		return normalized, nil
+	default:
+		return "", fmt.Errorf("context_compression_strategy must be empty, truncate, or summarize")
+	}
+}
+
+func validateContextCompressionInt(name string, value int) error {
+	if value < 0 {
+		return fmt.Errorf("%s must be >= 0", name)
+	}
+	return nil
 }
 
 // validateFallbackGroup 校验降级分组的有效性
@@ -1954,6 +2005,31 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 	}
 	if input.ContextCompressionEnabled != nil {
 		group.ContextCompressionEnabled = *input.ContextCompressionEnabled
+	}
+	if input.ContextCompressionStrategy != nil {
+		strategy, err := normalizeContextCompressionStrategy(*input.ContextCompressionStrategy)
+		if err != nil {
+			return nil, err
+		}
+		group.ContextCompressionStrategy = strategy
+	}
+	if input.ContextCompressionTriggerTokens != nil {
+		if err := validateContextCompressionInt("context_compression_trigger_tokens", *input.ContextCompressionTriggerTokens); err != nil {
+			return nil, err
+		}
+		group.ContextCompressionTriggerTokens = *input.ContextCompressionTriggerTokens
+	}
+	if input.ContextCompressionKeepLastMessages != nil {
+		if err := validateContextCompressionInt("context_compression_keep_last_messages", *input.ContextCompressionKeepLastMessages); err != nil {
+			return nil, err
+		}
+		group.ContextCompressionKeepLastMessages = *input.ContextCompressionKeepLastMessages
+	}
+	if input.ContextCompressionKeepLastTokens != nil {
+		if err := validateContextCompressionInt("context_compression_keep_last_tokens", *input.ContextCompressionKeepLastTokens); err != nil {
+			return nil, err
+		}
+		group.ContextCompressionKeepLastTokens = *input.ContextCompressionKeepLastTokens
 	}
 	sanitizeGroupMessagesDispatchFields(group)
 

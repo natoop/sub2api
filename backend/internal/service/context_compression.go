@@ -18,6 +18,22 @@ type ContextCompressionService struct {
 	cfg *config.ContextCompressionConfig
 }
 
+// ContextCompressionOptions 是分组级上下文压缩覆盖配置。
+// 空策略和 0 数值表示继承全局 gateway.context_compression 配置。
+type ContextCompressionOptions struct {
+	Strategy         string
+	TriggerTokens    int
+	KeepLastMessages int
+	KeepLastTokens   int
+}
+
+type resolvedContextCompressionOptions struct {
+	Strategy         string
+	TriggerTokens    int
+	KeepLastMessages int
+	KeepLastTokens   int
+}
+
 // NewContextCompressionService 创建上下文压缩服务
 func NewContextCompressionService(cfg *config.Config) *ContextCompressionService {
 	if cfg == nil {
@@ -44,43 +60,97 @@ func (s *ContextCompressionService) IsEnabled(platform, model string) bool {
 	return true
 }
 
+func contextCompressionOptionsFromGroup(group *Group) *ContextCompressionOptions {
+	if group == nil || !group.ContextCompressionEnabled {
+		return nil
+	}
+	return &ContextCompressionOptions{
+		Strategy:         group.ContextCompressionStrategy,
+		TriggerTokens:    group.ContextCompressionTriggerTokens,
+		KeepLastMessages: group.ContextCompressionKeepLastMessages,
+		KeepLastTokens:   group.ContextCompressionKeepLastTokens,
+	}
+}
+
+func (s *ContextCompressionService) resolveOptions(options *ContextCompressionOptions) resolvedContextCompressionOptions {
+	strategy := ""
+	triggerTokens := 0
+	keepLast := 0
+	keepTokens := 0
+	if options != nil {
+		strategy = options.Strategy
+		triggerTokens = options.TriggerTokens
+		keepLast = options.KeepLastMessages
+		keepTokens = options.KeepLastTokens
+	}
+	if s.cfg != nil {
+		if strings.TrimSpace(strategy) == "" {
+			strategy = s.cfg.Strategy
+		}
+		if triggerTokens <= 0 {
+			triggerTokens = s.cfg.TriggerTokens
+		}
+		if keepLast <= 0 {
+			keepLast = s.cfg.KeepLastMessages
+		}
+		if keepTokens <= 0 {
+			keepTokens = s.cfg.KeepLastTokens
+		}
+	}
+
+	strategy = strings.ToLower(strings.TrimSpace(strategy))
+	if strategy != config.CompressionStrategySummarize && strategy != config.CompressionStrategyTruncate {
+		strategy = config.CompressionStrategyTruncate
+	}
+	if triggerTokens <= 0 {
+		triggerTokens = 64000
+	}
+	if keepLast <= 0 {
+		keepLast = 20
+	}
+	if keepTokens <= 0 {
+		keepTokens = 32000
+	}
+	return resolvedContextCompressionOptions{
+		Strategy:         strategy,
+		TriggerTokens:    triggerTokens,
+		KeepLastMessages: keepLast,
+		KeepLastTokens:   keepTokens,
+	}
+}
+
 // CompressAnthropicBody 对 Anthropic 格式的请求体进行上下文压缩
 // 返回压缩后的 body 和是否执行了压缩
 func (s *ContextCompressionService) CompressAnthropicBody(body []byte, messages []any, model, platform string) ([]byte, bool) {
+	return s.compressAnthropicBody(body, messages, model, platform, nil)
+}
+
+// CompressAnthropicBodyForGroup 使用分组级覆盖参数对 Anthropic 请求体进行上下文压缩。
+func (s *ContextCompressionService) CompressAnthropicBodyForGroup(body []byte, messages []any, model, platform string, group *Group) ([]byte, bool) {
+	if group == nil || !group.ContextCompressionEnabled {
+		return body, false
+	}
+	return s.compressAnthropicBody(body, messages, model, platform, contextCompressionOptionsFromGroup(group))
+}
+
+func (s *ContextCompressionService) compressAnthropicBody(body []byte, messages []any, model, platform string, options *ContextCompressionOptions) ([]byte, bool) {
 	if !s.IsEnabled(platform, model) {
 		return body, false
 	}
 
 	totalTokens := estimateTokensFromMessagesSlice(messages)
-	triggerTokens := s.cfg.TriggerTokens
-	if triggerTokens <= 0 {
-		triggerTokens = 64000
-	}
-	if totalTokens <= triggerTokens {
+	resolved := s.resolveOptions(options)
+	if totalTokens <= resolved.TriggerTokens {
 		return body, false
-	}
-
-	keepLast := s.cfg.KeepLastMessages
-	if keepLast <= 0 {
-		keepLast = 20
-	}
-	keepTokens := s.cfg.KeepLastTokens
-	if keepTokens <= 0 {
-		keepTokens = 32000
-	}
-
-	strategy := s.cfg.Strategy
-	if strategy == "" {
-		strategy = config.CompressionStrategyTruncate
 	}
 
 	var newMessages []any
 	var compressed bool
-	switch strategy {
+	switch resolved.Strategy {
 	case config.CompressionStrategySummarize:
-		newMessages, compressed = truncateAndSummarize(messages, keepLast, keepTokens)
+		newMessages, compressed = truncateAndSummarize(messages, resolved.KeepLastMessages, resolved.KeepLastTokens)
 	default:
-		newMessages, compressed = truncateMessages(messages, keepLast, keepTokens)
+		newMessages, compressed = truncateMessages(messages, resolved.KeepLastMessages, resolved.KeepLastTokens)
 	}
 	if !compressed {
 		return body, false
@@ -93,7 +163,7 @@ func (s *ContextCompressionService) CompressAnthropicBody(body []byte, messages 
 	}
 
 	slog.Info("context_compression: messages compressed",
-		"strategy", strategy,
+		"strategy", resolved.Strategy,
 		"original_tokens", totalTokens,
 		"original_count", len(messages),
 		"compressed_count", len(newMessages),
@@ -290,6 +360,29 @@ func (s *ContextCompressionService) CompressAnthropicParsedRequest(parsed *Parse
 	return true
 }
 
+// CompressAnthropicParsedRequestForGroup 使用分组级覆盖参数对 ParsedRequest 进行上下文压缩。
+func (s *ContextCompressionService) CompressAnthropicParsedRequestForGroup(parsed *ParsedRequest, group *Group) bool {
+	if group == nil || !group.ContextCompressionEnabled {
+		return false
+	}
+	newBody, compressed := s.CompressAnthropicBodyForGroup(
+		parsed.Body,
+		parsed.Messages,
+		parsed.Model,
+		PlatformAnthropic,
+		group,
+	)
+	if !compressed {
+		return false
+	}
+
+	parsed.Body = newBody
+	if msgs := extractMessagesFromBody(newBody); msgs != nil {
+		parsed.Messages = msgs
+	}
+	return true
+}
+
 // extractMessagesFromBody 从请求体中提取 messages 数组
 func extractMessagesFromBody(body []byte) []any {
 	var req struct {
@@ -425,16 +518,32 @@ func buildSummaryAnthropicMessage(summary string) map[string]any {
 
 // CompressChatCompletionsBody 对 Chat Completions 格式的请求体进行上下文压缩
 func (s *ContextCompressionService) CompressChatCompletionsBody(body []byte, model, platform string) ([]byte, bool) {
-	return s.compressBodyField(body, model, platform, "messages")
+	return s.compressBodyField(body, model, platform, "messages", nil)
+}
+
+// CompressChatCompletionsBodyForGroup 使用分组级覆盖参数对 Chat Completions 请求体进行上下文压缩。
+func (s *ContextCompressionService) CompressChatCompletionsBodyForGroup(body []byte, model, platform string, group *Group) ([]byte, bool) {
+	if group == nil || !group.ContextCompressionEnabled {
+		return body, false
+	}
+	return s.compressBodyField(body, model, platform, "messages", contextCompressionOptionsFromGroup(group))
 }
 
 // CompressResponsesBody 对 OpenAI Responses 格式的请求体进行上下文压缩
 func (s *ContextCompressionService) CompressResponsesBody(body []byte, model, platform string) ([]byte, bool) {
-	return s.compressBodyField(body, model, platform, "input")
+	return s.compressBodyField(body, model, platform, "input", nil)
+}
+
+// CompressResponsesBodyForGroup 使用分组级覆盖参数对 OpenAI Responses 请求体进行上下文压缩。
+func (s *ContextCompressionService) CompressResponsesBodyForGroup(body []byte, model, platform string, group *Group) ([]byte, bool) {
+	if group == nil || !group.ContextCompressionEnabled {
+		return body, false
+	}
+	return s.compressBodyField(body, model, platform, "input", contextCompressionOptionsFromGroup(group))
 }
 
 // compressBodyField 通用压缩方法，对指定字段名（messages 或 input）的数组进行截断
-func (s *ContextCompressionService) compressBodyField(body []byte, model, platform, fieldName string) ([]byte, bool) {
+func (s *ContextCompressionService) compressBodyField(body []byte, model, platform, fieldName string, options *ContextCompressionOptions) ([]byte, bool) {
 	if !s.IsEnabled(platform, model) {
 		return body, false
 	}
@@ -445,35 +554,18 @@ func (s *ContextCompressionService) compressBodyField(body []byte, model, platfo
 	}
 
 	totalTokens := estimateTokensFromMessagesSlice(messages)
-	triggerTokens := s.cfg.TriggerTokens
-	if triggerTokens <= 0 {
-		triggerTokens = 64000
-	}
-	if totalTokens <= triggerTokens {
+	resolved := s.resolveOptions(options)
+	if totalTokens <= resolved.TriggerTokens {
 		return body, false
-	}
-
-	keepLast := s.cfg.KeepLastMessages
-	if keepLast <= 0 {
-		keepLast = 20
-	}
-	keepTokens := s.cfg.KeepLastTokens
-	if keepTokens <= 0 {
-		keepTokens = 32000
-	}
-
-	strategy := s.cfg.Strategy
-	if strategy == "" {
-		strategy = config.CompressionStrategyTruncate
 	}
 
 	var newMessages []any
 	var compressed bool
-	switch strategy {
+	switch resolved.Strategy {
 	case config.CompressionStrategySummarize:
-		newMessages, compressed = truncateCCAndSummarize(messages, keepLast, keepTokens)
+		newMessages, compressed = truncateCCAndSummarize(messages, resolved.KeepLastMessages, resolved.KeepLastTokens)
 	default:
-		newMessages, compressed = truncateCCMessages(messages, keepLast, keepTokens)
+		newMessages, compressed = truncateCCMessages(messages, resolved.KeepLastMessages, resolved.KeepLastTokens)
 	}
 	if !compressed {
 		return body, false
@@ -486,7 +578,7 @@ func (s *ContextCompressionService) compressBodyField(body []byte, model, platfo
 	}
 
 	slog.Info("context_compression: messages compressed",
-		"strategy", strategy,
+		"strategy", resolved.Strategy,
 		"field", fieldName,
 		"original_tokens", totalTokens,
 		"original_count", len(messages),

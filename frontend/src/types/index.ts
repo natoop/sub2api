@@ -526,6 +526,10 @@ export interface Group {
   require_oauth_only: boolean
   require_privacy_set: boolean
   context_compression_enabled: boolean
+  context_compression_strategy: ContextCompressionStrategy
+  context_compression_trigger_tokens: number
+  context_compression_keep_last_messages: number
+  context_compression_keep_last_tokens: number
   created_at: string
   updated_at: string
 }
@@ -636,6 +640,10 @@ export interface CreateGroupRequest {
   require_oauth_only?: boolean
   require_privacy_set?: boolean
   context_compression_enabled?: boolean
+  context_compression_strategy?: ContextCompressionStrategy
+  context_compression_trigger_tokens?: number
+  context_compression_keep_last_messages?: number
+  context_compression_keep_last_tokens?: number
   // 从指定分组复制账号
   copy_accounts_from_group_ids?: number[]
 }
@@ -665,12 +673,17 @@ export interface UpdateGroupRequest {
   require_oauth_only?: boolean
   require_privacy_set?: boolean
   context_compression_enabled?: boolean
+  context_compression_strategy?: ContextCompressionStrategy
+  context_compression_trigger_tokens?: number
+  context_compression_keep_last_messages?: number
+  context_compression_keep_last_tokens?: number
   copy_accounts_from_group_ids?: number[]
 }
 
 // ==================== Account & Proxy Types ====================
 
 export type AccountPlatform = 'anthropic' | 'openai' | 'gemini' | 'antigravity'
+export type ContextCompressionStrategy = '' | 'truncate' | 'summarize'
 export type AccountType = 'oauth' | 'setup-token' | 'apikey' | 'upstream' | 'bedrock' | 'service_account'
 export type OAuthAddMethod = 'oauth' | 'setup-token'
 export type ProxyProtocol = 'http' | 'https' | 'socks5' | 'socks5h'

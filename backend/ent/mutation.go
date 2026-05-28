@@ -14886,6 +14886,10 @@ type GroupMutation struct {
 	addimage_price_4k                       *float64
 	claude_code_only                        *bool
 	context_compression_enabled             *bool
+	context_compression_strategy            *string
+	context_compression_trigger_tokens      *int
+	context_compression_keep_last_messages  *int
+	context_compression_keep_last_tokens    *int
 	fallback_group_id                       *int64
 	addfallback_group_id                    *int64
 	fallback_group_id_on_invalid_request    *int64
@@ -16108,6 +16112,150 @@ func (m *GroupMutation) ResetContextCompressionEnabled() {
 	m.context_compression_enabled = nil
 }
 
+// SetContextCompressionStrategy sets the "context_compression_strategy" field.
+func (m *GroupMutation) SetContextCompressionStrategy(s string) {
+	m.context_compression_strategy = &s
+}
+
+// ContextCompressionStrategy returns the value of the "context_compression_strategy" field in the mutation.
+func (m *GroupMutation) ContextCompressionStrategy() (r string, exists bool) {
+	v := m.context_compression_strategy
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContextCompressionStrategy returns the old "context_compression_strategy" field's value of the Group entity.
+// If the Group object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GroupMutation) OldContextCompressionStrategy(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContextCompressionStrategy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContextCompressionStrategy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContextCompressionStrategy: %w", err)
+	}
+	return oldValue.ContextCompressionStrategy, nil
+}
+
+// ResetContextCompressionStrategy resets all changes to the "context_compression_strategy" field.
+func (m *GroupMutation) ResetContextCompressionStrategy() {
+	m.context_compression_strategy = nil
+}
+
+// SetContextCompressionTriggerTokens sets the "context_compression_trigger_tokens" field.
+func (m *GroupMutation) SetContextCompressionTriggerTokens(i int) {
+	m.context_compression_trigger_tokens = &i
+}
+
+// ContextCompressionTriggerTokens returns the value of the "context_compression_trigger_tokens" field in the mutation.
+func (m *GroupMutation) ContextCompressionTriggerTokens() (r int, exists bool) {
+	v := m.context_compression_trigger_tokens
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContextCompressionTriggerTokens returns the old "context_compression_trigger_tokens" field's value of the Group entity.
+// If the Group object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GroupMutation) OldContextCompressionTriggerTokens(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContextCompressionTriggerTokens is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContextCompressionTriggerTokens requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContextCompressionTriggerTokens: %w", err)
+	}
+	return oldValue.ContextCompressionTriggerTokens, nil
+}
+
+// ResetContextCompressionTriggerTokens resets all changes to the "context_compression_trigger_tokens" field.
+func (m *GroupMutation) ResetContextCompressionTriggerTokens() {
+	m.context_compression_trigger_tokens = nil
+}
+
+// SetContextCompressionKeepLastMessages sets the "context_compression_keep_last_messages" field.
+func (m *GroupMutation) SetContextCompressionKeepLastMessages(i int) {
+	m.context_compression_keep_last_messages = &i
+}
+
+// ContextCompressionKeepLastMessages returns the value of the "context_compression_keep_last_messages" field in the mutation.
+func (m *GroupMutation) ContextCompressionKeepLastMessages() (r int, exists bool) {
+	v := m.context_compression_keep_last_messages
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContextCompressionKeepLastMessages returns the old "context_compression_keep_last_messages" field's value of the Group entity.
+// If the Group object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GroupMutation) OldContextCompressionKeepLastMessages(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContextCompressionKeepLastMessages is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContextCompressionKeepLastMessages requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContextCompressionKeepLastMessages: %w", err)
+	}
+	return oldValue.ContextCompressionKeepLastMessages, nil
+}
+
+// ResetContextCompressionKeepLastMessages resets all changes to the "context_compression_keep_last_messages" field.
+func (m *GroupMutation) ResetContextCompressionKeepLastMessages() {
+	m.context_compression_keep_last_messages = nil
+}
+
+// SetContextCompressionKeepLastTokens sets the "context_compression_keep_last_tokens" field.
+func (m *GroupMutation) SetContextCompressionKeepLastTokens(i int) {
+	m.context_compression_keep_last_tokens = &i
+}
+
+// ContextCompressionKeepLastTokens returns the value of the "context_compression_keep_last_tokens" field in the mutation.
+func (m *GroupMutation) ContextCompressionKeepLastTokens() (r int, exists bool) {
+	v := m.context_compression_keep_last_tokens
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContextCompressionKeepLastTokens returns the old "context_compression_keep_last_tokens" field's value of the Group entity.
+// If the Group object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GroupMutation) OldContextCompressionKeepLastTokens(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContextCompressionKeepLastTokens is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContextCompressionKeepLastTokens requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContextCompressionKeepLastTokens: %w", err)
+	}
+	return oldValue.ContextCompressionKeepLastTokens, nil
+}
+
+// ResetContextCompressionKeepLastTokens resets all changes to the "context_compression_keep_last_tokens" field.
+func (m *GroupMutation) ResetContextCompressionKeepLastTokens() {
+	m.context_compression_keep_last_tokens = nil
+}
+
 // SetFallbackGroupID sets the "fallback_group_id" field.
 func (m *GroupMutation) SetFallbackGroupID(i int64) {
 	m.fallback_group_id = &i
@@ -17176,6 +17324,18 @@ func (m *GroupMutation) Fields() []string {
 	if m.context_compression_enabled != nil {
 		fields = append(fields, group.FieldContextCompressionEnabled)
 	}
+	if m.context_compression_strategy != nil {
+		fields = append(fields, group.FieldContextCompressionStrategy)
+	}
+	if m.context_compression_trigger_tokens != nil {
+		fields = append(fields, group.FieldContextCompressionTriggerTokens)
+	}
+	if m.context_compression_keep_last_messages != nil {
+		fields = append(fields, group.FieldContextCompressionKeepLastMessages)
+	}
+	if m.context_compression_keep_last_tokens != nil {
+		fields = append(fields, group.FieldContextCompressionKeepLastTokens)
+	}
 	return fields
 }
 
@@ -17254,6 +17414,14 @@ func (m *GroupMutation) Field(name string) (ent.Value, bool) {
 		return m.RpmLimit()
 	case group.FieldContextCompressionEnabled:
 		return m.ContextCompressionEnabled()
+	case group.FieldContextCompressionStrategy:
+		return m.ContextCompressionStrategy()
+	case group.FieldContextCompressionTriggerTokens:
+		return m.ContextCompressionTriggerTokens()
+	case group.FieldContextCompressionKeepLastMessages:
+		return m.ContextCompressionKeepLastMessages()
+	case group.FieldContextCompressionKeepLastTokens:
+		return m.ContextCompressionKeepLastTokens()
 	}
 	return nil, false
 }
@@ -17333,6 +17501,14 @@ func (m *GroupMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldRpmLimit(ctx)
 	case group.FieldContextCompressionEnabled:
 		return m.OldContextCompressionEnabled(ctx)
+	case group.FieldContextCompressionStrategy:
+		return m.OldContextCompressionStrategy(ctx)
+	case group.FieldContextCompressionTriggerTokens:
+		return m.OldContextCompressionTriggerTokens(ctx)
+	case group.FieldContextCompressionKeepLastMessages:
+		return m.OldContextCompressionKeepLastMessages(ctx)
+	case group.FieldContextCompressionKeepLastTokens:
+		return m.OldContextCompressionKeepLastTokens(ctx)
 	}
 	return nil, fmt.Errorf("unknown Group field %s", name)
 }
@@ -17586,6 +17762,34 @@ func (m *GroupMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetContextCompressionEnabled(v)
+		return nil
+	case group.FieldContextCompressionStrategy:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContextCompressionStrategy(v)
+		return nil
+	case group.FieldContextCompressionTriggerTokens:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContextCompressionTriggerTokens(v)
+		return nil
+	case group.FieldContextCompressionKeepLastMessages:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContextCompressionKeepLastMessages(v)
+		return nil
+	case group.FieldContextCompressionKeepLastTokens:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContextCompressionKeepLastTokens(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Group field %s", name)
@@ -17968,6 +18172,18 @@ func (m *GroupMutation) ResetField(name string) error {
 		return nil
 	case group.FieldContextCompressionEnabled:
 		m.ResetContextCompressionEnabled()
+		return nil
+	case group.FieldContextCompressionStrategy:
+		m.ResetContextCompressionStrategy()
+		return nil
+	case group.FieldContextCompressionTriggerTokens:
+		m.ResetContextCompressionTriggerTokens()
+		return nil
+	case group.FieldContextCompressionKeepLastMessages:
+		m.ResetContextCompressionKeepLastMessages()
+		return nil
+	case group.FieldContextCompressionKeepLastTokens:
+		m.ResetContextCompressionKeepLastTokens()
 		return nil
 	}
 	return fmt.Errorf("unknown Group field %s", name)

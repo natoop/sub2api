@@ -2255,6 +2255,12 @@ export default {
         enabled: 'Enabled',
         disabled: 'Disabled'
       },
+      contextCompression: {
+        title: 'Context Compression',
+        tooltip: 'When enabled, if the message context exceeds the globally configured token threshold, older messages will be automatically truncated or summarized to reduce upstream token consumption. Threshold and strategy are configured server-side.',
+        enabled: 'Enabled',
+        disabled: 'Disabled'
+      },
       claudeMaxSimulation: {
         title: 'Claude Max Usage Simulation',
         tooltip:

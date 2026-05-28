@@ -201,7 +201,7 @@ func (h *OpenAIGatewayHandler) Responses(c *gin.Context) {
 	}
 
 	// 上下文压缩：对 Responses API 的 input 数组进行截断
-	if h.contextCompressionSvc != nil {
+	if h.contextCompressionSvc != nil && apiKey.Group != nil && apiKey.Group.ContextCompressionEnabled {
 		if compressedBody, compressed := h.contextCompressionSvc.CompressResponsesBody(body, reqModel, service.PlatformOpenAI); compressed {
 			body = compressedBody
 			sessionHashBody = compressedBody

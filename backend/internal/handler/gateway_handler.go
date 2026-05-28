@@ -167,7 +167,7 @@ func (h *GatewayHandler) Messages(c *gin.Context) {
 	reqLog = reqLog.With(zap.String("model", reqModel), zap.Bool("stream", reqStream))
 
 	// 上下文压缩：在请求转发前对消息列表进行截断，减少上游 token 消耗
-	if h.contextCompressionSvc != nil {
+	if h.contextCompressionSvc != nil && apiKey.Group != nil && apiKey.Group.ContextCompressionEnabled {
 		if compressed := h.contextCompressionSvc.CompressAnthropicParsedRequest(parsedReq); compressed {
 			reqLog.Info("context_compression.applied",
 				zap.Int("compressed_message_count", len(parsedReq.Messages)),

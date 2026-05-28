@@ -14885,6 +14885,7 @@ type GroupMutation struct {
 	image_price_4k                          *float64
 	addimage_price_4k                       *float64
 	claude_code_only                        *bool
+	context_compression_enabled             *bool
 	fallback_group_id                       *int64
 	addfallback_group_id                    *int64
 	fallback_group_id_on_invalid_request    *int64
@@ -16072,6 +16073,42 @@ func (m *GroupMutation) ResetClaudeCodeOnly() {
 	m.claude_code_only = nil
 }
 
+// SetContextCompressionEnabled sets the "context_compression_enabled" field.
+func (m *GroupMutation) SetContextCompressionEnabled(b bool) {
+	m.context_compression_enabled = &b
+}
+
+// ContextCompressionEnabled returns the value of the "context_compression_enabled" field in the mutation.
+func (m *GroupMutation) ContextCompressionEnabled() (r bool, exists bool) {
+	v := m.context_compression_enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContextCompressionEnabled returns the old "context_compression_enabled" field's value of the Group entity.
+// If the Group object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GroupMutation) OldContextCompressionEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContextCompressionEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContextCompressionEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContextCompressionEnabled: %w", err)
+	}
+	return oldValue.ContextCompressionEnabled, nil
+}
+
+// ResetContextCompressionEnabled resets all changes to the "context_compression_enabled" field.
+func (m *GroupMutation) ResetContextCompressionEnabled() {
+	m.context_compression_enabled = nil
+}
+
 // SetFallbackGroupID sets the "fallback_group_id" field.
 func (m *GroupMutation) SetFallbackGroupID(i int64) {
 	m.fallback_group_id = &i
@@ -17176,6 +17213,9 @@ func (m *GroupMutation) Fields() []string {
 	if m.rpm_limit != nil {
 		fields = append(fields, group.FieldRpmLimit)
 	}
+	if m.context_compression_enabled != nil {
+		fields = append(fields, group.FieldContextCompressionEnabled)
+	}
 	return fields
 }
 
@@ -17254,6 +17294,8 @@ func (m *GroupMutation) Field(name string) (ent.Value, bool) {
 		return m.ModelsListConfig()
 	case group.FieldRpmLimit:
 		return m.RpmLimit()
+	case group.FieldContextCompressionEnabled:
+		return m.ContextCompressionEnabled()
 	}
 	return nil, false
 }
@@ -17333,6 +17375,8 @@ func (m *GroupMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldModelsListConfig(ctx)
 	case group.FieldRpmLimit:
 		return m.OldRpmLimit(ctx)
+	case group.FieldContextCompressionEnabled:
+		return m.OldContextCompressionEnabled(ctx)
 	}
 	return nil, fmt.Errorf("unknown Group field %s", name)
 }
@@ -17586,6 +17630,13 @@ func (m *GroupMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRpmLimit(v)
+		return nil
+	case group.FieldContextCompressionEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContextCompressionEnabled(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Group field %s", name)
@@ -17968,6 +18019,9 @@ func (m *GroupMutation) ResetField(name string) error {
 		return nil
 	case group.FieldRpmLimit:
 		m.ResetRpmLimit()
+		return nil
+	case group.FieldContextCompressionEnabled:
+		m.ResetContextCompressionEnabled()
 		return nil
 	}
 	return fmt.Errorf("unknown Group field %s", name)

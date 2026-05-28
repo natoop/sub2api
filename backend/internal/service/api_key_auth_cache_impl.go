@@ -274,6 +274,7 @@ func (s *APIKeyService) snapshotFromAPIKey(ctx context.Context, apiKey *APIKey) 
 			MessagesDispatchModelConfig:     apiKey.Group.MessagesDispatchModelConfig,
 			ModelsListConfig:                apiKey.Group.ModelsListConfig,
 			RPMLimit:                        apiKey.Group.RPMLimit,
+			ContextCompressionEnabled:       apiKey.Group.ContextCompressionEnabled,
 		}
 	}
 	return snapshot
@@ -345,6 +346,7 @@ func (s *APIKeyService) snapshotToAPIKey(key string, snapshot *APIKeyAuthSnapsho
 			MessagesDispatchModelConfig:     snapshot.Group.MessagesDispatchModelConfig,
 			ModelsListConfig:                snapshot.Group.ModelsListConfig,
 			RPMLimit:                        snapshot.Group.RPMLimit,
+		ContextCompressionEnabled:       snapshot.Group.ContextCompressionEnabled,
 		}
 	}
 	s.compileAPIKeyIPRules(apiKey)

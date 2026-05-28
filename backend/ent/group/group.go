@@ -58,6 +58,8 @@ const (
 	FieldImagePrice4k = "image_price_4k"
 	// FieldClaudeCodeOnly holds the string denoting the claude_code_only field in the database.
 	FieldClaudeCodeOnly = "claude_code_only"
+	// FieldContextCompressionEnabled holds the string denoting the context_compression_enabled field in the database.
+	FieldContextCompressionEnabled = "context_compression_enabled"
 	// FieldFallbackGroupID holds the string denoting the fallback_group_id field in the database.
 	FieldFallbackGroupID = "fallback_group_id"
 	// FieldFallbackGroupIDOnInvalidRequest holds the string denoting the fallback_group_id_on_invalid_request field in the database.
@@ -182,6 +184,7 @@ var Columns = []string{
 	FieldImagePrice2k,
 	FieldImagePrice4k,
 	FieldClaudeCodeOnly,
+	FieldContextCompressionEnabled,
 	FieldFallbackGroupID,
 	FieldFallbackGroupIDOnInvalidRequest,
 	FieldModelRouting,
@@ -283,6 +286,8 @@ var (
 	DefaultModelsListConfig domain.GroupModelsListConfig
 	// DefaultRpmLimit holds the default value on creation for the "rpm_limit" field.
 	DefaultRpmLimit int
+	// DefaultContextCompressionEnabled holds the default value on creation for the "context_compression_enabled" field.
+	DefaultContextCompressionEnabled bool
 )
 
 // OrderOption defines the ordering options for the Group queries.
@@ -446,6 +451,11 @@ func ByDefaultMappedModel(opts ...sql.OrderTermOption) OrderOption {
 // ByRpmLimit orders the results by the rpm_limit field.
 func ByRpmLimit(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRpmLimit, opts...).ToFunc()
+}
+
+// ByContextCompressionEnabled orders the results by the context_compression_enabled field.
+func ByContextCompressionEnabled(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldContextCompressionEnabled, opts...).ToFunc()
 }
 
 // ByAPIKeysCount orders the results by api_keys count.

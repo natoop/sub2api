@@ -91,6 +91,9 @@ type APIKeyAuthGroupSnapshot struct {
 
 	// RPMLimit 分组级每分钟请求数上限（0 = 不限制）；用于 billing_cache_service.checkRPM 级联判断。
 	RPMLimit int `json:"rpm_limit"`
+
+	// ContextCompressionEnabled 上下文压缩开关
+	ContextCompressionEnabled bool `json:"context_compression_enabled"`
 }
 
 // APIKeyAuthCacheEntry 缓存条目，支持负缓存

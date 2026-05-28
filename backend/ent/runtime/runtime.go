@@ -874,6 +874,10 @@ func init() {
 	groupDescRpmLimit := groupFields[30].Descriptor()
 	// group.DefaultRpmLimit holds the default value on creation for the rpm_limit field.
 	group.DefaultRpmLimit = groupDescRpmLimit.Default.(int)
+	// groupDescContextCompressionEnabled is the schema descriptor for context_compression_enabled field.
+	groupDescContextCompressionEnabled := groupFields[31].Descriptor()
+	// group.DefaultContextCompressionEnabled holds the default value on creation for the context_compression_enabled field.
+	group.DefaultContextCompressionEnabled = groupDescContextCompressionEnabled.Default.(bool)
 	idempotencyrecordMixin := schema.IdempotencyRecord{}.Mixin()
 	idempotencyrecordMixinFields0 := idempotencyrecordMixin[0].Fields()
 	_ = idempotencyrecordMixinFields0

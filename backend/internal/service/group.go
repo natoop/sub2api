@@ -66,6 +66,9 @@ type Group struct {
 	// 一旦设置即接管该分组用户的限流（覆盖用户级 rpm_limit），可被 user-group rpm_override 进一步覆盖。
 	RPMLimit int
 
+	// ContextCompressionEnabled 上下文压缩开关，开启后对超过阈值的消息进行截断或摘要
+	ContextCompressionEnabled bool
+
 	CreatedAt time.Time
 	UpdatedAt time.Time
 

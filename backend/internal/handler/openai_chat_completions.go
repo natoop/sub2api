@@ -87,7 +87,7 @@ func (h *OpenAIGatewayHandler) ChatCompletions(c *gin.Context) {
 	}
 
 	// 上下文压缩：对 Chat Completions 消息列表进行截断
-	if h.contextCompressionSvc != nil {
+	if h.contextCompressionSvc != nil && apiKey.Group != nil && apiKey.Group.ContextCompressionEnabled {
 		platform := service.PlatformOpenAI
 		if compressedBody, compressed := h.contextCompressionSvc.CompressChatCompletionsBody(body, reqModel, platform); compressed {
 			body = compressedBody

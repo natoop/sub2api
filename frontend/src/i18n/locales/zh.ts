@@ -2334,6 +2334,12 @@ export default {
         enabled: '已启用',
         disabled: '已禁用'
       },
+      contextCompression: {
+        title: '上下文压缩',
+        tooltip: '启用后，当消息上下文超过全局配置的 token 阈值时，自动截断或压缩旧消息以减少上游 token 消耗。全局阈值和压缩策略在服务端配置。',
+        enabled: '已启用',
+        disabled: '已禁用'
+      },
       supportedScopes: {
         title: '支持的模型系列',
         tooltip: '选择此分组支持的模型系列。未勾选的系列将不会被路由到此分组。',

@@ -160,6 +160,11 @@ func (Group) Fields() []ent.Field {
 		field.Int("rpm_limit").
 			Default(0).
 			Comment("分组 RPM 上限，0 表示不限制；设置后接管该分组用户的限流"),
+
+		// 上下文压缩开关（added by migration 143）
+		field.Bool("context_compression_enabled").
+			Default(false).
+			Comment("是否启用上下文压缩以减少上游 token 消耗"),
 	}
 }
 

@@ -66,6 +66,7 @@ func (r *groupRepository) Create(ctx context.Context, groupIn *service.Group) er
 		SetRequirePrivacySet(groupIn.RequirePrivacySet).
 		SetDefaultMappedModel(groupIn.DefaultMappedModel).
 		SetMessagesDispatchModelConfig(groupIn.MessagesDispatchModelConfig).
+		SetModelsListConfig(groupIn.ModelsListConfig).
 		SetRpmLimit(groupIn.RPMLimit).
 		SetContextCompressionEnabled(groupIn.ContextCompressionEnabled).
 		SetContextCompressionStrategy(groupIn.ContextCompressionStrategy).
@@ -146,6 +147,7 @@ func (r *groupRepository) Update(ctx context.Context, groupIn *service.Group) er
 		SetRequirePrivacySet(groupIn.RequirePrivacySet).
 		SetDefaultMappedModel(groupIn.DefaultMappedModel).
 		SetMessagesDispatchModelConfig(groupIn.MessagesDispatchModelConfig).
+		SetModelsListConfig(groupIn.ModelsListConfig).
 		SetRpmLimit(groupIn.RPMLimit).
 		SetContextCompressionEnabled(groupIn.ContextCompressionEnabled).
 		SetContextCompressionStrategy(groupIn.ContextCompressionStrategy).

@@ -70,6 +70,14 @@ type Group struct {
 
 	// ContextCompressionEnabled 上下文压缩开关，开启后对超过阈值的消息进行截断或摘要
 	ContextCompressionEnabled bool
+	// ContextCompressionStrategy 上下文压缩策略，空表示继承全局配置
+	ContextCompressionStrategy string
+	// ContextCompressionTriggerTokens 触发上下文压缩的 token 阈值，0 表示继承全局配置
+	ContextCompressionTriggerTokens int
+	// ContextCompressionKeepLastMessages 压缩后保留最近消息数，0 表示继承全局配置
+	ContextCompressionKeepLastMessages int
+	// ContextCompressionKeepLastTokens 压缩后保留最近 token 数，0 表示继承全局配置
+	ContextCompressionKeepLastTokens int
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

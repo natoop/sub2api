@@ -2257,9 +2257,18 @@ export default {
       },
       contextCompression: {
         title: 'Context Compression',
-        tooltip: 'When enabled, if the message context exceeds the globally configured token threshold, older messages will be automatically truncated or summarized to reduce upstream token consumption. Threshold and strategy are configured server-side.',
+        tooltip: 'When enabled, older messages are truncated or summarized after the context exceeds the token threshold. Strategy and thresholds can be overridden per group; empty values or 0 inherit the server defaults.',
         enabled: 'Enabled',
-        disabled: 'Disabled'
+        disabled: 'Disabled',
+        strategy: 'Compression Method',
+        strategyInherit: 'Inherit Global',
+        strategyTruncate: 'Truncate Older Messages',
+        strategySummarize: 'Summarize Older Messages',
+        strategyHint: 'Truncate drops older messages; summarize keeps a compact summary before the recent messages.',
+        triggerTokens: 'Trigger Tokens',
+        keepLastMessages: 'Keep Messages',
+        keepLastTokens: 'Keep Tokens',
+        paramsHint: 'Use 0 to inherit the global setting. Message count and token count are both applied to the retained context.'
       },
       claudeMaxSimulation: {
         title: 'Claude Max Usage Simulation',

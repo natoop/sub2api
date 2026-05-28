@@ -169,6 +169,19 @@ func (Group) Fields() []ent.Field {
 		field.Bool("context_compression_enabled").
 			Default(false).
 			Comment("是否启用上下文压缩以减少上游 token 消耗"),
+		field.String("context_compression_strategy").
+			MaxLen(32).
+			Default("").
+			Comment("上下文压缩策略：空表示继承全局配置，truncate 表示截断，summarize 表示摘要"),
+		field.Int("context_compression_trigger_tokens").
+			Default(0).
+			Comment("触发上下文压缩的 token 阈值，0 表示继承全局配置"),
+		field.Int("context_compression_keep_last_messages").
+			Default(0).
+			Comment("上下文压缩后保留的最近消息数量，0 表示继承全局配置"),
+		field.Int("context_compression_keep_last_tokens").
+			Default(0).
+			Comment("上下文压缩后保留的最近 token 数，0 表示继承全局配置"),
 	}
 }
 

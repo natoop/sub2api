@@ -1044,6 +1044,64 @@
               }}
             </span>
           </div>
+          <div
+            v-if="createForm.context_compression_enabled"
+            class="mt-4 space-y-3"
+          >
+            <div>
+              <label class="input-label">{{
+                t("admin.groups.contextCompression.strategy")
+              }}</label>
+              <Select
+                v-model="createForm.context_compression_strategy"
+                :options="contextCompressionStrategyOptions"
+              />
+              <p class="input-hint">
+                {{ t("admin.groups.contextCompression.strategyHint") }}
+              </p>
+            </div>
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div>
+                <label class="input-label">{{
+                  t("admin.groups.contextCompression.triggerTokens")
+                }}</label>
+                <input
+                  v-model.number="createForm.context_compression_trigger_tokens"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="input"
+                />
+              </div>
+              <div>
+                <label class="input-label">{{
+                  t("admin.groups.contextCompression.keepLastMessages")
+                }}</label>
+                <input
+                  v-model.number="createForm.context_compression_keep_last_messages"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="input"
+                />
+              </div>
+              <div>
+                <label class="input-label">{{
+                  t("admin.groups.contextCompression.keepLastTokens")
+                }}</label>
+                <input
+                  v-model.number="createForm.context_compression_keep_last_tokens"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="input"
+                />
+              </div>
+            </div>
+            <p class="input-hint">
+              {{ t("admin.groups.contextCompression.paramsHint") }}
+            </p>
+          </div>
         </div>
 
         <!-- Claude Code 客户端限制（仅 anthropic 平台） -->
@@ -2394,6 +2452,64 @@
               }}
             </span>
           </div>
+          <div
+            v-if="editForm.context_compression_enabled"
+            class="mt-4 space-y-3"
+          >
+            <div>
+              <label class="input-label">{{
+                t("admin.groups.contextCompression.strategy")
+              }}</label>
+              <Select
+                v-model="editForm.context_compression_strategy"
+                :options="contextCompressionStrategyOptions"
+              />
+              <p class="input-hint">
+                {{ t("admin.groups.contextCompression.strategyHint") }}
+              </p>
+            </div>
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div>
+                <label class="input-label">{{
+                  t("admin.groups.contextCompression.triggerTokens")
+                }}</label>
+                <input
+                  v-model.number="editForm.context_compression_trigger_tokens"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="input"
+                />
+              </div>
+              <div>
+                <label class="input-label">{{
+                  t("admin.groups.contextCompression.keepLastMessages")
+                }}</label>
+                <input
+                  v-model.number="editForm.context_compression_keep_last_messages"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="input"
+                />
+              </div>
+              <div>
+                <label class="input-label">{{
+                  t("admin.groups.contextCompression.keepLastTokens")
+                }}</label>
+                <input
+                  v-model.number="editForm.context_compression_keep_last_tokens"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="input"
+                />
+              </div>
+            </div>
+            <p class="input-hint">
+              {{ t("admin.groups.contextCompression.paramsHint") }}
+            </p>
+          </div>
         </div>
 
         <!-- Claude Code 客户端限制（仅 anthropic 平台） -->
@@ -3166,7 +3282,12 @@ import { useI18n } from "vue-i18n";
 import { useAppStore } from "@/stores/app";
 import { useOnboardingStore } from "@/stores/onboarding";
 import { adminAPI } from "@/api/admin";
-import type { AdminGroup, GroupPlatform, SubscriptionType } from "@/types";
+import type {
+  AdminGroup,
+  ContextCompressionStrategy,
+  GroupPlatform,
+  SubscriptionType,
+} from "@/types";
 import type { Column } from "@/components/common/types";
 import AppLayout from "@/components/layout/AppLayout.vue";
 import TablePageLayout from "@/components/layout/TablePageLayout.vue";
@@ -3280,6 +3401,12 @@ const editStatusOptions = computed(() => [
 const subscriptionTypeOptions = computed(() => [
   { value: "standard", label: t("admin.groups.subscription.standard") },
   { value: "subscription", label: t("admin.groups.subscription.subscription") },
+]);
+
+const contextCompressionStrategyOptions = computed(() => [
+  { value: "", label: t("admin.groups.contextCompression.strategyInherit") },
+  { value: "truncate", label: t("admin.groups.contextCompression.strategyTruncate") },
+  { value: "summarize", label: t("admin.groups.contextCompression.strategySummarize") },
 ]);
 
 // 降级分组选项（创建时）- 仅包含 anthropic 平台且未启用 claude_code_only 的分组
@@ -3485,6 +3612,10 @@ const createForm = reactive({
   mcp_xml_inject: true,
   // 上下文压缩开关
   context_compression_enabled: false,
+  context_compression_strategy: "" as ContextCompressionStrategy,
+  context_compression_trigger_tokens: 0,
+  context_compression_keep_last_messages: 0,
+  context_compression_keep_last_tokens: 0,
   // 从分组复制账号
   copy_accounts_from_group_ids: [] as number[],
   // 分组级 RPM 限制（每用户每分钟最大请求数；0 = 不限制）
@@ -3819,6 +3950,10 @@ const editForm = reactive({
   mcp_xml_inject: true,
   // 上下文压缩开关
   context_compression_enabled: false,
+  context_compression_strategy: "" as ContextCompressionStrategy,
+  context_compression_trigger_tokens: 0,
+  context_compression_keep_last_messages: 0,
+  context_compression_keep_last_tokens: 0,
   // 从分组复制账号
   copy_accounts_from_group_ids: [] as number[],
   // 分组级 RPM 限制（每用户每分钟最大请求数；0 = 不限制）
@@ -4059,6 +4194,10 @@ const closeCreateModal = () => {
   createForm.supported_model_scopes = ["claude", "gemini_text", "gemini_image"];
   createForm.mcp_xml_inject = true;
   createForm.context_compression_enabled = false;
+  createForm.context_compression_strategy = "";
+  createForm.context_compression_trigger_tokens = 0;
+  createForm.context_compression_keep_last_messages = 0;
+  createForm.context_compression_keep_last_tokens = 0;
   createForm.copy_accounts_from_group_ids = [];
   createForm.rpm_limit = 0;
   resetModelsListState(createModelsListState);
@@ -4092,6 +4231,22 @@ const normalizeImageRateMultiplier = (
   }
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : 1;
+};
+
+const normalizeContextCompressionInt = (
+  value: number | string | null | undefined,
+): number => {
+  if (value === null || value === undefined || value === "") {
+    return 0;
+  }
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 0;
+};
+
+const normalizeContextCompressionStrategy = (
+  value: string | null | undefined,
+): ContextCompressionStrategy => {
+  return value === "truncate" || value === "summarize" ? value : "";
 };
 
 const handleCreateGroup = async () => {
@@ -4140,6 +4295,22 @@ const handleCreateGroup = async () => {
     requestData.image_rate_multiplier = normalizeImageRateMultiplier(
       requestData.image_rate_multiplier,
     );
+    requestData.context_compression_strategy =
+      normalizeContextCompressionStrategy(
+        requestData.context_compression_strategy,
+      );
+    requestData.context_compression_trigger_tokens =
+      normalizeContextCompressionInt(
+        requestData.context_compression_trigger_tokens,
+      );
+    requestData.context_compression_keep_last_messages =
+      normalizeContextCompressionInt(
+        requestData.context_compression_keep_last_messages,
+      );
+    requestData.context_compression_keep_last_tokens =
+      normalizeContextCompressionInt(
+        requestData.context_compression_keep_last_tokens,
+      );
     await adminAPI.groups.create(requestData);
     appStore.showSuccess(t("admin.groups.groupCreated"));
     closeCreateModal();
@@ -4203,6 +4374,14 @@ const handleEdit = async (group: AdminGroup) => {
   editForm.mcp_xml_inject = group.mcp_xml_inject ?? true;
   editForm.context_compression_enabled =
     group.context_compression_enabled ?? false;
+  editForm.context_compression_strategy =
+    group.context_compression_strategy ?? "";
+  editForm.context_compression_trigger_tokens =
+    group.context_compression_trigger_tokens ?? 0;
+  editForm.context_compression_keep_last_messages =
+    group.context_compression_keep_last_messages ?? 0;
+  editForm.context_compression_keep_last_tokens =
+    group.context_compression_keep_last_tokens ?? 0;
   editForm.copy_accounts_from_group_ids = []; // 复制账号字段每次编辑时重置为空
   editForm.rpm_limit = group.rpm_limit ?? 0;
   resetModelsListState(editModelsListState, group.models_list_config);
@@ -4223,6 +4402,10 @@ const closeEditModal = () => {
   editingGroup.value = null;
   editModelRoutingRules.value = [];
   editForm.copy_accounts_from_group_ids = [];
+  editForm.context_compression_strategy = "";
+  editForm.context_compression_trigger_tokens = 0;
+  editForm.context_compression_keep_last_messages = 0;
+  editForm.context_compression_keep_last_tokens = 0;
   resetMessagesDispatchFormState(editForm);
   resetModelsListState(editModelsListState);
 };
@@ -4281,6 +4464,21 @@ const handleUpdateGroup = async () => {
     payload.image_rate_multiplier = normalizeImageRateMultiplier(
       payload.image_rate_multiplier,
     );
+    payload.context_compression_strategy = normalizeContextCompressionStrategy(
+      payload.context_compression_strategy,
+    );
+    payload.context_compression_trigger_tokens =
+      normalizeContextCompressionInt(
+        payload.context_compression_trigger_tokens,
+      );
+    payload.context_compression_keep_last_messages =
+      normalizeContextCompressionInt(
+        payload.context_compression_keep_last_messages,
+      );
+    payload.context_compression_keep_last_tokens =
+      normalizeContextCompressionInt(
+        payload.context_compression_keep_last_tokens,
+      );
     await adminAPI.groups.update(editingGroup.value.id, payload);
     appStore.showSuccess(t("admin.groups.groupUpdated"));
     closeEditModal();

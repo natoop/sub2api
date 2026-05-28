@@ -727,6 +727,10 @@ func groupEntityToService(g *dbent.Group) *service.Group {
 		ModelsListConfig:                g.ModelsListConfig,
 		RPMLimit:                        g.RpmLimit,
 		ContextCompressionEnabled:       g.ContextCompressionEnabled,
+		ContextCompressionStrategy:      g.ContextCompressionStrategy,
+		ContextCompressionTriggerTokens: g.ContextCompressionTriggerTokens,
+		ContextCompressionKeepLastMessages: g.ContextCompressionKeepLastMessages,
+		ContextCompressionKeepLastTokens:   g.ContextCompressionKeepLastTokens,
 		CreatedAt:                       g.CreatedAt,
 		UpdatedAt:                       g.UpdatedAt,
 	}

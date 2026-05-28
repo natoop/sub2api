@@ -91,6 +91,14 @@ type Group struct {
 	RpmLimit int `json:"rpm_limit,omitempty"`
 	// 是否启用上下文压缩以减少上游 token 消耗
 	ContextCompressionEnabled bool `json:"context_compression_enabled,omitempty"`
+	// 上下文压缩策略：空表示继承全局配置，truncate 表示截断，summarize 表示摘要
+	ContextCompressionStrategy string `json:"context_compression_strategy,omitempty"`
+	// 触发上下文压缩的 token 阈值，0 表示继承全局配置
+	ContextCompressionTriggerTokens int `json:"context_compression_trigger_tokens,omitempty"`
+	// 上下文压缩后保留的最近消息数量，0 表示继承全局配置
+	ContextCompressionKeepLastMessages int `json:"context_compression_keep_last_messages,omitempty"`
+	// 上下文压缩后保留的最近 token 数，0 表示继承全局配置
+	ContextCompressionKeepLastTokens int `json:"context_compression_keep_last_tokens,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GroupQuery when eager-loading is set.
 	Edges        GroupEdges `json:"edges"`
@@ -199,13 +207,13 @@ func (*Group) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case group.FieldModelRouting, group.FieldSupportedModelScopes, group.FieldMessagesDispatchModelConfig, group.FieldModelsListConfig:
 			values[i] = new([]byte)
-		case group.FieldIsExclusive, group.FieldAllowImageGeneration, group.FieldImageRateIndependent, group.FieldClaudeCodeOnly, group.FieldModelRoutingEnabled, group.FieldMcpXMLInject, group.FieldAllowMessagesDispatch, group.FieldRequireOauthOnly, group.FieldRequirePrivacySet:
+		case group.FieldIsExclusive, group.FieldAllowImageGeneration, group.FieldImageRateIndependent, group.FieldClaudeCodeOnly, group.FieldContextCompressionEnabled, group.FieldModelRoutingEnabled, group.FieldMcpXMLInject, group.FieldAllowMessagesDispatch, group.FieldRequireOauthOnly, group.FieldRequirePrivacySet:
 			values[i] = new(sql.NullBool)
 		case group.FieldRateMultiplier, group.FieldDailyLimitUsd, group.FieldWeeklyLimitUsd, group.FieldMonthlyLimitUsd, group.FieldImageRateMultiplier, group.FieldImagePrice1k, group.FieldImagePrice2k, group.FieldImagePrice4k:
 			values[i] = new(sql.NullFloat64)
-		case group.FieldID, group.FieldDefaultValidityDays, group.FieldFallbackGroupID, group.FieldFallbackGroupIDOnInvalidRequest, group.FieldSortOrder, group.FieldRpmLimit:
+		case group.FieldID, group.FieldDefaultValidityDays, group.FieldContextCompressionTriggerTokens, group.FieldContextCompressionKeepLastMessages, group.FieldContextCompressionKeepLastTokens, group.FieldFallbackGroupID, group.FieldFallbackGroupIDOnInvalidRequest, group.FieldSortOrder, group.FieldRpmLimit:
 			values[i] = new(sql.NullInt64)
-		case group.FieldName, group.FieldDescription, group.FieldStatus, group.FieldPlatform, group.FieldSubscriptionType, group.FieldDefaultMappedModel:
+		case group.FieldName, group.FieldDescription, group.FieldStatus, group.FieldPlatform, group.FieldSubscriptionType, group.FieldContextCompressionStrategy, group.FieldDefaultMappedModel:
 			values[i] = new(sql.NullString)
 		case group.FieldCreatedAt, group.FieldUpdatedAt, group.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -363,6 +371,36 @@ func (_m *Group) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field claude_code_only", values[i])
 			} else if value.Valid {
 				_m.ClaudeCodeOnly = value.Bool
+			}
+		case group.FieldContextCompressionEnabled:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field context_compression_enabled", values[i])
+			} else if value.Valid {
+				_m.ContextCompressionEnabled = value.Bool
+			}
+		case group.FieldContextCompressionStrategy:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field context_compression_strategy", values[i])
+			} else if value.Valid {
+				_m.ContextCompressionStrategy = value.String
+			}
+		case group.FieldContextCompressionTriggerTokens:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field context_compression_trigger_tokens", values[i])
+			} else if value.Valid {
+				_m.ContextCompressionTriggerTokens = int(value.Int64)
+			}
+		case group.FieldContextCompressionKeepLastMessages:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field context_compression_keep_last_messages", values[i])
+			} else if value.Valid {
+				_m.ContextCompressionKeepLastMessages = int(value.Int64)
+			}
+		case group.FieldContextCompressionKeepLastTokens:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field context_compression_keep_last_tokens", values[i])
+			} else if value.Valid {
+				_m.ContextCompressionKeepLastTokens = int(value.Int64)
 			}
 		case group.FieldFallbackGroupID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

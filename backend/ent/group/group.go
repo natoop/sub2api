@@ -60,6 +60,14 @@ const (
 	FieldClaudeCodeOnly = "claude_code_only"
 	// FieldContextCompressionEnabled holds the string denoting the context_compression_enabled field in the database.
 	FieldContextCompressionEnabled = "context_compression_enabled"
+	// FieldContextCompressionStrategy holds the string denoting the context_compression_strategy field in the database.
+	FieldContextCompressionStrategy = "context_compression_strategy"
+	// FieldContextCompressionTriggerTokens holds the string denoting the context_compression_trigger_tokens field in the database.
+	FieldContextCompressionTriggerTokens = "context_compression_trigger_tokens"
+	// FieldContextCompressionKeepLastMessages holds the string denoting the context_compression_keep_last_messages field in the database.
+	FieldContextCompressionKeepLastMessages = "context_compression_keep_last_messages"
+	// FieldContextCompressionKeepLastTokens holds the string denoting the context_compression_keep_last_tokens field in the database.
+	FieldContextCompressionKeepLastTokens = "context_compression_keep_last_tokens"
 	// FieldFallbackGroupID holds the string denoting the fallback_group_id field in the database.
 	FieldFallbackGroupID = "fallback_group_id"
 	// FieldFallbackGroupIDOnInvalidRequest holds the string denoting the fallback_group_id_on_invalid_request field in the database.
@@ -185,6 +193,10 @@ var Columns = []string{
 	FieldImagePrice4k,
 	FieldClaudeCodeOnly,
 	FieldContextCompressionEnabled,
+	FieldContextCompressionStrategy,
+	FieldContextCompressionTriggerTokens,
+	FieldContextCompressionKeepLastMessages,
+	FieldContextCompressionKeepLastTokens,
 	FieldFallbackGroupID,
 	FieldFallbackGroupIDOnInvalidRequest,
 	FieldModelRouting,
@@ -288,6 +300,14 @@ var (
 	DefaultRpmLimit int
 	// DefaultContextCompressionEnabled holds the default value on creation for the "context_compression_enabled" field.
 	DefaultContextCompressionEnabled bool
+	// DefaultContextCompressionStrategy holds the default value on creation for the "context_compression_strategy" field.
+	DefaultContextCompressionStrategy string
+	// DefaultContextCompressionTriggerTokens holds the default value on creation for the "context_compression_trigger_tokens" field.
+	DefaultContextCompressionTriggerTokens int
+	// DefaultContextCompressionKeepLastMessages holds the default value on creation for the "context_compression_keep_last_messages" field.
+	DefaultContextCompressionKeepLastMessages int
+	// DefaultContextCompressionKeepLastTokens holds the default value on creation for the "context_compression_keep_last_tokens" field.
+	DefaultContextCompressionKeepLastTokens int
 )
 
 // OrderOption defines the ordering options for the Group queries.

@@ -2342,9 +2342,18 @@ export default {
       },
       contextCompression: {
         title: '上下文压缩',
-        tooltip: '启用后，当消息上下文超过全局配置的 token 阈值时，自动截断或压缩旧消息以减少上游 token 消耗。全局阈值和压缩策略在服务端配置。',
+        tooltip: '启用后，当消息上下文超过 token 阈值时，自动截断或摘要旧消息以减少上游 token 消耗。策略和阈值可在此分组覆盖，留空或填 0 则继承服务端全局配置。',
         enabled: '已启用',
-        disabled: '已禁用'
+        disabled: '已禁用',
+        strategy: '压缩方式',
+        strategyInherit: '继承全局配置',
+        strategyTruncate: '截断旧消息',
+        strategySummarize: '摘要旧消息',
+        strategyHint: '截断会直接丢弃较早消息；摘要会把较早消息压成一条摘要后保留。',
+        triggerTokens: '触发阈值',
+        keepLastMessages: '保留消息数',
+        keepLastTokens: '保留 Token 数',
+        paramsHint: '数值填 0 表示继承全局配置。保留消息数和保留 Token 数会共同限制最终上下文。'
       },
       supportedScopes: {
         title: '支持的模型系列',

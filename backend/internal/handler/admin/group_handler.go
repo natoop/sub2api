@@ -118,6 +118,14 @@ type CreateGroupRequest struct {
 	RPMLimit int `json:"rpm_limit"`
 	// 上下文压缩开关
 	ContextCompressionEnabled bool `json:"context_compression_enabled"`
+	// 上下文压缩策略：空表示继承全局配置
+	ContextCompressionStrategy string `json:"context_compression_strategy"`
+	// 触发压缩的 token 阈值，0 表示继承全局配置
+	ContextCompressionTriggerTokens int `json:"context_compression_trigger_tokens"`
+	// 压缩后保留最近消息数，0 表示继承全局配置
+	ContextCompressionKeepLastMessages int `json:"context_compression_keep_last_messages"`
+	// 压缩后保留最近 token 数，0 表示继承全局配置
+	ContextCompressionKeepLastTokens int `json:"context_compression_keep_last_tokens"`
 	// 从指定分组复制账号（创建后自动绑定）
 	CopyAccountsFromGroupIDs []int64 `json:"copy_accounts_from_group_ids"`
 }
@@ -161,6 +169,14 @@ type UpdateGroupRequest struct {
 	RPMLimit *int `json:"rpm_limit"`
 	// 上下文压缩开关；nil 表示未提供不改动
 	ContextCompressionEnabled *bool `json:"context_compression_enabled"`
+	// 上下文压缩策略；nil 表示未提供不改动，空字符串表示继承全局配置
+	ContextCompressionStrategy *string `json:"context_compression_strategy"`
+	// 触发压缩的 token 阈值；nil 表示未提供不改动，0 表示继承全局配置
+	ContextCompressionTriggerTokens *int `json:"context_compression_trigger_tokens"`
+	// 压缩后保留最近消息数；nil 表示未提供不改动，0 表示继承全局配置
+	ContextCompressionKeepLastMessages *int `json:"context_compression_keep_last_messages"`
+	// 压缩后保留最近 token 数；nil 表示未提供不改动，0 表示继承全局配置
+	ContextCompressionKeepLastTokens *int `json:"context_compression_keep_last_tokens"`
 	// 从指定分组复制账号（同步操作：先清空当前分组的账号绑定，再绑定源分组的账号）
 	CopyAccountsFromGroupIDs []int64 `json:"copy_accounts_from_group_ids"`
 }
@@ -306,6 +322,10 @@ func (h *GroupHandler) Create(c *gin.Context) {
 		ModelsListConfig:                req.ModelsListConfig,
 		RPMLimit:                        req.RPMLimit,
 		ContextCompressionEnabled:       req.ContextCompressionEnabled,
+		ContextCompressionStrategy:      req.ContextCompressionStrategy,
+		ContextCompressionTriggerTokens: req.ContextCompressionTriggerTokens,
+		ContextCompressionKeepLastMessages: req.ContextCompressionKeepLastMessages,
+		ContextCompressionKeepLastTokens:   req.ContextCompressionKeepLastTokens,
 		CopyAccountsFromGroupIDs:        req.CopyAccountsFromGroupIDs,
 	})
 	if err != nil {
@@ -363,6 +383,10 @@ func (h *GroupHandler) Update(c *gin.Context) {
 		ModelsListConfig:                req.ModelsListConfig,
 		RPMLimit:                        req.RPMLimit,
 		ContextCompressionEnabled:       req.ContextCompressionEnabled,
+		ContextCompressionStrategy:      req.ContextCompressionStrategy,
+		ContextCompressionTriggerTokens: req.ContextCompressionTriggerTokens,
+		ContextCompressionKeepLastMessages: req.ContextCompressionKeepLastMessages,
+		ContextCompressionKeepLastTokens:   req.ContextCompressionKeepLastTokens,
 		CopyAccountsFromGroupIDs:        req.CopyAccountsFromGroupIDs,
 	})
 	if err != nil {

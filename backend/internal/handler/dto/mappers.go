@@ -191,6 +191,10 @@ func groupFromServiceBase(g *service.Group) Group {
 		RequirePrivacySet:               g.RequirePrivacySet,
 		RPMLimit:                        g.RPMLimit,
 		ContextCompressionEnabled:       g.ContextCompressionEnabled,
+		ContextCompressionStrategy:      g.ContextCompressionStrategy,
+		ContextCompressionTriggerTokens: g.ContextCompressionTriggerTokens,
+		ContextCompressionKeepLastMessages: g.ContextCompressionKeepLastMessages,
+		ContextCompressionKeepLastTokens:   g.ContextCompressionKeepLastTokens,
 		CreatedAt:                       g.CreatedAt,
 		UpdatedAt:                       g.UpdatedAt,
 	}

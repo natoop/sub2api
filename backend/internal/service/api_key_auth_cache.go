@@ -94,6 +94,14 @@ type APIKeyAuthGroupSnapshot struct {
 
 	// ContextCompressionEnabled 上下文压缩开关
 	ContextCompressionEnabled bool `json:"context_compression_enabled"`
+	// ContextCompressionStrategy 上下文压缩策略，空表示继承全局配置
+	ContextCompressionStrategy string `json:"context_compression_strategy"`
+	// ContextCompressionTriggerTokens 触发压缩的 token 阈值，0 表示继承全局配置
+	ContextCompressionTriggerTokens int `json:"context_compression_trigger_tokens"`
+	// ContextCompressionKeepLastMessages 压缩后保留最近消息数，0 表示继承全局配置
+	ContextCompressionKeepLastMessages int `json:"context_compression_keep_last_messages"`
+	// ContextCompressionKeepLastTokens 压缩后保留最近 token 数，0 表示继承全局配置
+	ContextCompressionKeepLastTokens int `json:"context_compression_keep_last_tokens"`
 }
 
 // APIKeyAuthCacheEntry 缓存条目，支持负缓存

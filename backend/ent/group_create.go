@@ -329,6 +329,30 @@ func (_c *GroupCreate) SetNillableContextCompressionEnabled(v *bool) *GroupCreat
 	return _c
 }
 
+// SetContextCompressionStrategy sets the "context_compression_strategy" field.
+func (_c *GroupCreate) SetContextCompressionStrategy(v string) *GroupCreate {
+	_c.mutation.SetContextCompressionStrategy(v)
+	return _c
+}
+
+// SetContextCompressionTriggerTokens sets the "context_compression_trigger_tokens" field.
+func (_c *GroupCreate) SetContextCompressionTriggerTokens(v int) *GroupCreate {
+	_c.mutation.SetContextCompressionTriggerTokens(v)
+	return _c
+}
+
+// SetContextCompressionKeepLastMessages sets the "context_compression_keep_last_messages" field.
+func (_c *GroupCreate) SetContextCompressionKeepLastMessages(v int) *GroupCreate {
+	_c.mutation.SetContextCompressionKeepLastMessages(v)
+	return _c
+}
+
+// SetContextCompressionKeepLastTokens sets the "context_compression_keep_last_tokens" field.
+func (_c *GroupCreate) SetContextCompressionKeepLastTokens(v int) *GroupCreate {
+	_c.mutation.SetContextCompressionKeepLastTokens(v)
+	return _c
+}
+
 // SetFallbackGroupID sets the "fallback_group_id" field.
 func (_c *GroupCreate) SetFallbackGroupID(v int64) *GroupCreate {
 	_c.mutation.SetFallbackGroupID(v)
@@ -694,6 +718,22 @@ func (_c *GroupCreate) defaults() error {
 		v := group.DefaultContextCompressionEnabled
 		_c.mutation.SetContextCompressionEnabled(v)
 	}
+	if _, ok := _c.mutation.ContextCompressionStrategy(); !ok {
+		v := group.DefaultContextCompressionStrategy
+		_c.mutation.SetContextCompressionStrategy(v)
+	}
+	if _, ok := _c.mutation.ContextCompressionTriggerTokens(); !ok {
+		v := group.DefaultContextCompressionTriggerTokens
+		_c.mutation.SetContextCompressionTriggerTokens(v)
+	}
+	if _, ok := _c.mutation.ContextCompressionKeepLastMessages(); !ok {
+		v := group.DefaultContextCompressionKeepLastMessages
+		_c.mutation.SetContextCompressionKeepLastMessages(v)
+	}
+	if _, ok := _c.mutation.ContextCompressionKeepLastTokens(); !ok {
+		v := group.DefaultContextCompressionKeepLastTokens
+		_c.mutation.SetContextCompressionKeepLastTokens(v)
+	}
 	if _, ok := _c.mutation.ModelRoutingEnabled(); !ok {
 		v := group.DefaultModelRoutingEnabled
 		_c.mutation.SetModelRoutingEnabled(v)
@@ -804,6 +844,18 @@ func (_c *GroupCreate) check() error {
 	}
 	if _, ok := _c.mutation.ContextCompressionEnabled(); !ok {
 		return &ValidationError{Name: "context_compression_enabled", err: errors.New(`ent: missing required field "Group.context_compression_enabled"`)}
+	}
+	if _, ok := _c.mutation.ContextCompressionStrategy(); !ok {
+		return &ValidationError{Name: "context_compression_strategy", err: errors.New(`ent: missing required field "Group.context_compression_strategy"`)}
+	}
+	if _, ok := _c.mutation.ContextCompressionTriggerTokens(); !ok {
+		return &ValidationError{Name: "context_compression_trigger_tokens", err: errors.New(`ent: missing required field "Group.context_compression_trigger_tokens"`)}
+	}
+	if _, ok := _c.mutation.ContextCompressionKeepLastMessages(); !ok {
+		return &ValidationError{Name: "context_compression_keep_last_messages", err: errors.New(`ent: missing required field "Group.context_compression_keep_last_messages"`)}
+	}
+	if _, ok := _c.mutation.ContextCompressionKeepLastTokens(); !ok {
+		return &ValidationError{Name: "context_compression_keep_last_tokens", err: errors.New(`ent: missing required field "Group.context_compression_keep_last_tokens"`)}
 	}
 	if _, ok := _c.mutation.ModelRoutingEnabled(); !ok {
 		return &ValidationError{Name: "model_routing_enabled", err: errors.New(`ent: missing required field "Group.model_routing_enabled"`)}
@@ -957,6 +1009,22 @@ func (_c *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.ContextCompressionEnabled(); ok {
 		_spec.SetField(group.FieldContextCompressionEnabled, field.TypeBool, value)
 		_node.ContextCompressionEnabled = value
+	}
+	if value, ok := _c.mutation.ContextCompressionStrategy(); ok {
+		_spec.SetField(group.FieldContextCompressionStrategy, field.TypeString, value)
+		_node.ContextCompressionStrategy = value
+	}
+	if value, ok := _c.mutation.ContextCompressionTriggerTokens(); ok {
+		_spec.SetField(group.FieldContextCompressionTriggerTokens, field.TypeInt, value)
+		_node.ContextCompressionTriggerTokens = value
+	}
+	if value, ok := _c.mutation.ContextCompressionKeepLastMessages(); ok {
+		_spec.SetField(group.FieldContextCompressionKeepLastMessages, field.TypeInt, value)
+		_node.ContextCompressionKeepLastMessages = value
+	}
+	if value, ok := _c.mutation.ContextCompressionKeepLastTokens(); ok {
+		_spec.SetField(group.FieldContextCompressionKeepLastTokens, field.TypeInt, value)
+		_node.ContextCompressionKeepLastTokens = value
 	}
 	if value, ok := _c.mutation.FallbackGroupID(); ok {
 		_spec.SetField(group.FieldFallbackGroupID, field.TypeInt64, value)

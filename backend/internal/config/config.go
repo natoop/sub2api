@@ -794,6 +794,10 @@ type GatewayConfig struct {
 	// UserMessageQueue: 用户消息串行队列配置
 	// 对 role:"user" 的真实用户消息实施账号级串行化 + RPM 自适应延迟
 	UserMessageQueue UserMessageQueueConfig `mapstructure:"user_message_queue"`
+
+	// ContextCompression: 上下文压缩配置
+	// 当消息上下文超过阈值时，自动截断或压缩旧消息以减少上游 token 消耗
+	ContextCompression ContextCompressionConfig `mapstructure:"context_compression"`
 }
 
 // GatewayOpenAIHTTP2Config OpenAI HTTP 上游协议配置。
@@ -851,6 +855,59 @@ func (c *UserMessageQueueConfig) GetEffectiveMode() string {
 		return UMQModeSerialize // 向后兼容
 	}
 	return ""
+}
+
+// 上下文压缩策略常量
+const (
+	// CompressionStrategyTruncate: 直接丢弃超出限制的旧消息
+	CompressionStrategyTruncate = "truncate"
+	// CompressionStrategySummarize: 将旧消息压缩为摘要文本，保留在上下文开头
+	CompressionStrategySummarize = "summarize"
+)
+
+// ContextCompressionConfig 上下文压缩配置
+// 当消息上下文超过阈值时，自动截断旧消息以减少上游 token 消耗。
+type ContextCompressionConfig struct {
+	// Enabled: 全局开关（默认 false）
+	Enabled bool `mapstructure:"enabled"`
+	// Strategy: 压缩策略（"truncate" | "summarize"，默认 "truncate"）
+	Strategy string `mapstructure:"strategy"`
+	// TriggerTokens: 消息总 token 数超过此值才触发压缩（默认 64000）
+	TriggerTokens int `mapstructure:"trigger_tokens"`
+	// KeepLastMessages: 保留最近 N 条消息（默认 20）
+	KeepLastMessages int `mapstructure:"keep_last_messages"`
+	// KeepLastTokens: 保留最近 N 个 token（默认 32000，与 KeepLastMessages 取更保守者）
+	KeepLastTokens int `mapstructure:"keep_last_tokens"`
+	// Platforms: 仅在指定平台生效，空数组表示全平台
+	Platforms []string `mapstructure:"platforms"`
+	// Models: 仅在指定模型生效，空数组表示全模型
+	Models []string `mapstructure:"models"`
+}
+
+// IsPlatformEnabled 检查指定平台是否启用压缩
+func (c *ContextCompressionConfig) IsPlatformEnabled(platform string) bool {
+	if len(c.Platforms) == 0 {
+		return true
+	}
+	for _, p := range c.Platforms {
+		if p == platform {
+			return true
+		}
+	}
+	return false
+}
+
+// IsModelEnabled 检查指定模型是否启用压缩
+func (c *ContextCompressionConfig) IsModelEnabled(model string) bool {
+	if len(c.Models) == 0 {
+		return true
+	}
+	for _, m := range c.Models {
+		if m == model {
+			return true
+		}
+	}
+	return false
 }
 
 // GatewayOpenAIWSConfig OpenAI Responses WebSocket 配置。
@@ -1900,6 +1957,15 @@ func setDefaults() {
 	viper.SetDefault("gateway.user_message_queue.min_delay_ms", 200)
 	viper.SetDefault("gateway.user_message_queue.max_delay_ms", 2000)
 	viper.SetDefault("gateway.user_message_queue.cleanup_interval_seconds", 60)
+
+	// Context compression defaults
+	viper.SetDefault("gateway.context_compression.enabled", false)
+	viper.SetDefault("gateway.context_compression.strategy", "truncate")
+	viper.SetDefault("gateway.context_compression.trigger_tokens", 64000)
+	viper.SetDefault("gateway.context_compression.keep_last_messages", 20)
+	viper.SetDefault("gateway.context_compression.keep_last_tokens", 32000)
+	viper.SetDefault("gateway.context_compression.platforms", []string{})
+	viper.SetDefault("gateway.context_compression.models", []string{})
 
 	viper.SetDefault("gateway.tls_fingerprint.enabled", true)
 	viper.SetDefault("concurrency.ping_interval", 10)

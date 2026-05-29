@@ -879,23 +879,23 @@ func init() {
 	// group.DefaultRpmLimit holds the default value on creation for the rpm_limit field.
 	group.DefaultRpmLimit = groupDescRpmLimit.Default.(int)
 	// groupDescContextCompressionEnabled is the schema descriptor for context_compression_enabled field.
-	groupDescContextCompressionEnabled := groupFields[31].Descriptor()
+	groupDescContextCompressionEnabled := groupFields[32].Descriptor()
 	// group.DefaultContextCompressionEnabled holds the default value on creation for the context_compression_enabled field.
 	group.DefaultContextCompressionEnabled = groupDescContextCompressionEnabled.Default.(bool)
 	// groupDescContextCompressionStrategy is the schema descriptor for context_compression_strategy field.
-	groupDescContextCompressionStrategy := groupFields[32].Descriptor()
+	groupDescContextCompressionStrategy := groupFields[33].Descriptor()
 	// group.DefaultContextCompressionStrategy holds the default value on creation for the context_compression_strategy field.
 	group.DefaultContextCompressionStrategy = groupDescContextCompressionStrategy.Default.(string)
 	// groupDescContextCompressionTriggerTokens is the schema descriptor for context_compression_trigger_tokens field.
-	groupDescContextCompressionTriggerTokens := groupFields[33].Descriptor()
+	groupDescContextCompressionTriggerTokens := groupFields[34].Descriptor()
 	// group.DefaultContextCompressionTriggerTokens holds the default value on creation for the context_compression_trigger_tokens field.
 	group.DefaultContextCompressionTriggerTokens = groupDescContextCompressionTriggerTokens.Default.(int)
 	// groupDescContextCompressionKeepLastMessages is the schema descriptor for context_compression_keep_last_messages field.
-	groupDescContextCompressionKeepLastMessages := groupFields[34].Descriptor()
+	groupDescContextCompressionKeepLastMessages := groupFields[35].Descriptor()
 	// group.DefaultContextCompressionKeepLastMessages holds the default value on creation for the context_compression_keep_last_messages field.
 	group.DefaultContextCompressionKeepLastMessages = groupDescContextCompressionKeepLastMessages.Default.(int)
 	// groupDescContextCompressionKeepLastTokens is the schema descriptor for context_compression_keep_last_tokens field.
-	groupDescContextCompressionKeepLastTokens := groupFields[35].Descriptor()
+	groupDescContextCompressionKeepLastTokens := groupFields[36].Descriptor()
 	// group.DefaultContextCompressionKeepLastTokens holds the default value on creation for the context_compression_keep_last_tokens field.
 	group.DefaultContextCompressionKeepLastTokens = groupDescContextCompressionKeepLastTokens.Default.(int)
 	idempotencyrecordMixin := schema.IdempotencyRecord{}.Mixin()

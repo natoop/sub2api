@@ -74,7 +74,12 @@ func (r *groupRepository) Create(ctx context.Context, groupIn *service.Group) er
 		SetContextCompressionKeepLastTokens(groupIn.ContextCompressionKeepLastTokens).
 
 		SetModelsListConfig(groupIn.ModelsListConfig).
-		SetRpmLimit(groupIn.RPMLimit)
+		SetRpmLimit(groupIn.RPMLimit).
+		SetContextCompressionEnabled(groupIn.ContextCompressionEnabled).
+		SetContextCompressionStrategy(groupIn.ContextCompressionStrategy).
+		SetContextCompressionTriggerTokens(groupIn.ContextCompressionTriggerTokens).
+		SetContextCompressionKeepLastMessages(groupIn.ContextCompressionKeepLastMessages).
+		SetContextCompressionKeepLastTokens(groupIn.ContextCompressionKeepLastTokens)
 
 	// 设置模型路由配置
 	if groupIn.ModelRouting != nil {
@@ -157,7 +162,12 @@ func (r *groupRepository) Update(ctx context.Context, groupIn *service.Group) er
 		SetContextCompressionKeepLastTokens(groupIn.ContextCompressionKeepLastTokens).
 
 		SetModelsListConfig(groupIn.ModelsListConfig).
-		SetRpmLimit(groupIn.RPMLimit)
+		SetRpmLimit(groupIn.RPMLimit).
+		SetContextCompressionEnabled(groupIn.ContextCompressionEnabled).
+		SetContextCompressionStrategy(groupIn.ContextCompressionStrategy).
+		SetContextCompressionTriggerTokens(groupIn.ContextCompressionTriggerTokens).
+		SetContextCompressionKeepLastMessages(groupIn.ContextCompressionKeepLastMessages).
+		SetContextCompressionKeepLastTokens(groupIn.ContextCompressionKeepLastTokens)
 
 	// 显式处理可空字段：nil 需要 clear，非 nil 需要 set。
 	if groupIn.DailyLimitUSD != nil {

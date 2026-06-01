@@ -195,11 +195,6 @@ func (h *OpenAIGatewayHandler) Responses(c *gin.Context) {
 	setOpsRequestContext(c, reqModel, reqStream)
 	setOpsEndpointContext(c, "", int16(service.RequestTypeFromLegacy(reqStream, false)))
 
-	if decision := h.checkContentModeration(c, reqLog, apiKey, subject, service.ContentModerationProtocolOpenAIResponses, reqModel, body); decision != nil && decision.Blocked {
-		h.errorResponse(c, contentModerationStatus(decision), contentModerationErrorCode(decision), decision.Message)
-		return
-	}
-
 	// 上下文压缩：对 Responses API 的 input 数组进行截断
 	if h.contextCompressionSvc != nil && apiKey.Group != nil && apiKey.Group.ContextCompressionEnabled {
 		if compressedBody, compressed := h.contextCompressionSvc.CompressResponsesBodyForGroup(body, reqModel, service.PlatformOpenAI, apiKey.Group); compressed {
@@ -207,6 +202,11 @@ func (h *OpenAIGatewayHandler) Responses(c *gin.Context) {
 			sessionHashBody = compressedBody
 			reqLog.Info("context_compression.responses_applied")
 		}
+	}
+
+	if decision := h.checkContentModeration(c, reqLog, apiKey, subject, service.ContentModerationProtocolOpenAIResponses, reqModel, body); decision != nil && decision.Blocked {
+		h.errorResponse(c, contentModerationStatus(decision), contentModerationErrorCode(decision), decision.Message)
+		return
 	}
 
 	imageIntent := service.IsImageGenerationIntent("/v1/responses", reqModel, body)

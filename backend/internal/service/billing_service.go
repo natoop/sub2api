@@ -81,6 +81,8 @@ type ModelPricing struct {
 	InputPricePerTokenPriority     float64 // priority service tier 下每token输入价格 (USD)
 	OutputPricePerToken            float64 // 每token输出价格 (USD)
 	OutputPricePerTokenPriority    float64 // priority service tier 下每token输出价格 (USD)
+	MaxInputTokens                 int     // 模型最大输入 token 数（如价格数据提供）
+	MaxOutputTokens                int     // 模型最大输出 token 数（如价格数据提供）
 	CacheCreationPricePerToken     float64 // 缓存创建每token价格 (USD)
 	CacheReadPricePerToken         float64 // 缓存读取每token价格 (USD)
 	CacheReadPricePerTokenPriority float64 // priority service tier 下缓存读取每token价格 (USD)
@@ -372,6 +374,8 @@ func (s *BillingService) GetModelPricing(model string) (*ModelPricing, error) {
 				InputPricePerTokenPriority:     litellmPricing.InputCostPerTokenPriority,
 				OutputPricePerToken:            litellmPricing.OutputCostPerToken,
 				OutputPricePerTokenPriority:    litellmPricing.OutputCostPerTokenPriority,
+				MaxInputTokens:                 litellmPricing.MaxInputTokens,
+				MaxOutputTokens:                litellmPricing.MaxOutputTokens,
 				CacheCreationPricePerToken:     litellmPricing.CacheCreationInputTokenCost,
 				CacheReadPricePerToken:         litellmPricing.CacheReadInputTokenCost,
 				CacheReadPricePerTokenPriority: litellmPricing.CacheReadInputTokenCostPriority,
